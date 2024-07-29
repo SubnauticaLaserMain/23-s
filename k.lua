@@ -1776,12 +1776,11 @@ elseif game.PlaceId == 4620170611 then
 
 
 
-    local RemoveToolFromInventory = {['Value'] = ''}
 
     local RemoveToolFromInventorySettings = {[1] = '', BackPack = {}, BackpackForList = {}}
 
 
-    RemoveToolFromInventory = Utility.CreateOptionsButton({
+    local RemoveToolFromInventory = Utility.CreateOptionsButton({
         Name = 'RemoveFromBackpack',
         Function = function()
             if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
@@ -1797,8 +1796,10 @@ elseif game.PlaceId == 4620170611 then
 
     for a, b in lplr:WaitForChild('Backpack', 60):GetChildren() do
         RemoveToolFromInventorySettings.BackPack[b.Name] = b
+        table.insert(RemoveToolFromInventorySettings.BackpackForList, b.Name)
     end
 
+    print(RemoveToolFromInventory)
 
     local DropdownListForBackpack = RemoveToolFromInventory.CreateDropdown({
         Name = 'Backpack',
@@ -1850,7 +1851,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/owp.lua', true))()
 
 if a then
     a()
