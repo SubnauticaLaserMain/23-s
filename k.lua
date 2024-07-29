@@ -1822,8 +1822,8 @@ elseif game.PlaceId == 4620170611 then
 
 
     local SearchForItem = RemoveToolFromInventory.CreateTextBox({
-        Name = 'Search',
         TempText = 'Type the name of the Item you want to remove.',
+        Name = 'Search',
         FocusLost = function(Val)
             RemoveToolFromInventorySettings[1] = Val
         end
@@ -1881,7 +1881,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
 
 if a then
     a()
