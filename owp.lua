@@ -1471,7 +1471,7 @@ elseif game.PlaceId == 4620170611 then
 
 
 
-    local A = {[1] = 1}
+    local A = {[1] = 1, [2] = 'Front'}
 
     local AutoDoor = Utility.CreateOptionsButton({
         Name = 'AutoDoor',
@@ -1479,7 +1479,7 @@ elseif game.PlaceId == 4620170611 then
             getgenv().GetAutoDoorAllowed = Callback
             if Callback then
                 repeat
-                    DoDoorRemote('Front')
+                    DoDoorRemote(A[2])
                     task.wait(A[1])
                 until (not GetAutoDoorAllowed)
             end
@@ -1497,13 +1497,25 @@ elseif game.PlaceId == 4620170611 then
         end,
         HoverText = 'Set how fast it will spam the door.'
     })
+
+    AutoDoor.CreateDropdown({
+        Name = 'Door',
+        List = {
+            'Front Door',
+            'Basement Door'
+        },
+        Function = function(Val)
+            A[2] = Val:gsub(' Door', '')
+        end,
+        HoverText = 'Wish door will be affected.'
+    })
 end
 
 shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/OK-DUDE/main/test1.lua?token=GHSAT0AAAAAACR2L3BKOOL6JNJRFNLYQFDQZVHMM6Q', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/owp.lua', true))()
 
 if a then
     a()
