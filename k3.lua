@@ -1719,7 +1719,7 @@ elseif game.PlaceId == 4620170611 then
         Default = 'Bat',
         HoverText = 'Select the melee weapon you want to be given.',
         Function = function(Val)
-            C[1] = Val
+            C[1] = WeaponsTrasnlate[Val]
         end
     })
 
@@ -1732,7 +1732,7 @@ elseif game.PlaceId == 4620170611 then
         Default = 'Gun',
         HoverText = 'Select the ranged weapon you want to be given.',
         Function = function(Val)
-            C[1] = Val
+            C[1] = WeaponsTrasnlate[Val]
         end
     })
 
@@ -1771,6 +1771,8 @@ elseif game.PlaceId == 4620170611 then
 
     Tools.Object.Visible = false
     Weapons.Object.Visible = false
+    RangedWeapons.Object.Visible = false
+    IsDoingRanged.Object.Visible = false
 
 
     local CatagoryDrop = GiveItemTool.CreateDropdown({
@@ -1787,18 +1789,31 @@ elseif game.PlaceId == 4620170611 then
                 HowManySlider.Object.Visible = true
                 Weapons.Object.Visible = false
                 Tools.Object.Visible = false
+                RangedWeapons.Object.Visible = false
+                IsDoingRanged.Object.Visible = false
                 SetDropdownItem(Tools, C[1])
             elseif Val == 'Weapons' then
                 Foods.Object.Visible = false
                 HowManySlider.Object.Visible = false
-                Weapons.Object.Visible = true
                 Tools.Object.Visible = false
+                IsDoingRanged.Object.Visible = true
+
+                if (C[4] == 'Melee') then
+                    Weapons.Object.Visible = true
+                    RangedWeapons.Object.Visible = false
+                elseif (C[4] == 'Ranged') then
+                    Weapons.Object.Visible = false
+                    RangedWeapons.Object.Visible = true
+                end
+
                 SetDropdownItem(Tools, C[1])
             elseif Val == 'Tools' then
                 Foods.Object.Visible = false
                 HowManySlider.Object.Visible = false
                 Weapons.Object.Visible = false
                 Tools.Object.Visible = true
+                RangedWeapons.Object.Visible = false
+                IsDoingRanged.Object.Visible = false
                 SetDropdownItem(Tools, C[1])
             end
 
@@ -1911,7 +1926,7 @@ elseif game.PlaceId == 4620170611 then
         if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) then
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         else
-            RemoveToolFromInventorySettings.BackPack[child.Name] = nil
+            RemoveToolFromInventorySettings.BackpackForList[child.Name] = nil
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         end
     end)
@@ -1921,7 +1936,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
 
 if a then
     a()
