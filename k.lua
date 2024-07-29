@@ -1847,7 +1847,8 @@ elseif game.PlaceId == 4620170611 then
                 SearchForItem.Object.Visible = false
                 DropdownListForBackpack.Object.Visible = true
             end
-        end
+        end,
+        Default = 'Dropdown'
     })
 
 
