@@ -1872,7 +1872,6 @@ elseif game.PlaceId == 4620170611 then
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         else
             RemoveToolFromInventorySettings.BackPack[child.Name] = nil
-            table.insert(RemoveToolFromInventorySettings.BackpackForList, child.Name)
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         end
     end)
