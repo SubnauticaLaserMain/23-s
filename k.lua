@@ -1821,6 +1821,36 @@ elseif game.PlaceId == 4620170611 then
 
 
 
+    local SearchForItem = RemoveToolFromInventory.CreateTextBox({
+        Name = 'Search',
+        HoverText = 'Type the name of the Item you want to remove.',
+        FocusLost = function(Val)
+            RemoveToolFromInventorySettings[1] = Val
+        end
+    })
+
+
+    SearchForItem.Object.Visible = false
+
+
+    RemoveToolFromInventory.CreateDropdown({
+        Name = 'Method',
+        List = {
+            'Dropdown',
+            'SearchBar'
+        },
+        Function = function(Val)
+            if Val == 'SearchBar' then
+                SearchForItem.Object.Visible = true
+                DropdownListForBackpack.Object.Visible = false
+            else
+                SearchForItem.Object.Visible = false
+                DropdownListForBackpack.Object.Visible = true
+            end
+        end
+    })
+
+
     local function UpdateBackpackPlayerList(newList)
         DropdownListForBackpack.UpdateList(newList)
     end
@@ -1851,7 +1881,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/owp.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
 
 if a then
     a()
