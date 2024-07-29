@@ -1785,6 +1785,7 @@ elseif game.PlaceId == 4620170611 then
         Function = function()
             if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
                 RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]]:Destroy()
+                RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
 
                 if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
                     RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
@@ -1822,8 +1823,8 @@ elseif game.PlaceId == 4620170611 then
 
 
     local SearchForItem = RemoveToolFromInventory.CreateTextBox({
+        TempText = 'Type the name of the Item you want to remove.',
         Name = 'Search',
-        PlaceholderText = 'Type the name of the Item you want to remove.',
         FocusLost = function(Val)
             RemoveToolFromInventorySettings[1] = Val
         end
@@ -1847,7 +1848,8 @@ elseif game.PlaceId == 4620170611 then
                 SearchForItem.Object.Visible = false
                 DropdownListForBackpack.Object.Visible = true
             end
-        end
+        end,
+        Default = 'Dropdown'
     })
 
 
@@ -1871,7 +1873,6 @@ elseif game.PlaceId == 4620170611 then
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         else
             RemoveToolFromInventorySettings.BackPack[child.Name] = nil
-            table.insert(RemoveToolFromInventorySettings.BackpackForList, child.Name)
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         end
     end)
