@@ -1589,7 +1589,8 @@ elseif game.PlaceId == 4620170611 then
         'Small Pizza',
         'Normal Pizza',
         'Large Pizza',
-        'Lollipop'
+        'Lollipop',
+        'Poisonous Pizza'
     }
 
 
@@ -1601,7 +1602,8 @@ elseif game.PlaceId == 4620170611 then
         ['Small Pizza'] = 'Pizza1',
         ['Normal Pizza'] = 'Pizza2',
         ['Large Pizza'] = 'Pizza3',
-        ['Lollipop'] = 'Lollipop'
+        ['Lollipop'] = 'Lollipop',
+        ['Poisonous Pizza'] = 'EpicPizza',
     }
 
 
@@ -1621,14 +1623,27 @@ elseif game.PlaceId == 4620170611 then
         ['Ice Breaker'] = 'Breaker',
         ['Toy Sword'] = 'Sword',
         ['Gun'] = 'Gun',
-        ['Swat Gun'] = 'SwatGun'
+        ['Swat Gun'] = 'SwatGun',
+        ['Sword'] = 'LinkedSword'
     }
 
+
+    local ToolsTable = {
+        ['Key'] = 'Key',
+        ['Med Kit'] = 'MedKit',
+        ['Cure'] = 'Cure',
+        ['Car Key'] = 'CarKey',
+        ['Louie'] = 'Louie',
+        ['Teddy Bear'] = 'TeddyBloxpin',
+    }
+
+
+    TranslateTools = ToolsTable
 
 
     local GiveItemTool = {['Enabled'] = false}
 
-    local C = {[1] = 'Apple', [2] = 1, [3] = 'Foods'}
+    local C = {[1] = 'Apple', [2] = 1, [3] = 'Foods', [4] = 'Melee'}
 
 
     local function GiveFoodRemote()
@@ -1694,11 +1709,15 @@ elseif game.PlaceId == 4620170611 then
         Name = 'Tools',
         List = {
             'Key',
-
+            'Cure',
+            'Med Kit',
+            'Car Key',
+            'Louie',
+            'Teddy Bear',
         },
         HoverText = 'Select the tool you want to be given.',
         Function = function(Val)
-            C[1] = Val
+            C[1] = TranslateTools[Val]
         end
     })
 
@@ -1713,13 +1732,46 @@ elseif game.PlaceId == 4620170611 then
             'Pitchfork',
             'Ice Breaker',
             'Toy Sword',
+            'Sword'
+        },
+        Default = 'Bat',
+        HoverText = 'Select the melee weapon you want to be given.',
+        Function = function(Val)
+            C[1] = WeaponsTrasnlate[Val]
+        end
+    })
+
+    local RangedWeapons = GiveItemTool.CreateDropdown({
+        Name = 'Weapons',
+        List = {
             'Gun',
             'Swat Gun'
         },
-        Default = 'Bat',
-        HoverText = 'Select the weapon you want to be given.',
+        Default = 'Gun',
+        HoverText = 'Select the ranged weapon you want to be given.',
         Function = function(Val)
-            C[1] = Val
+            C[1] = WeaponsTrasnlate[Val]
+        end
+    })
+
+
+    local IsDoingRanged = GiveItemTool.CreateDropdown({
+        Name = 'WeaponType',
+        List = {
+            'Melee',
+            'Ranged'
+        },
+        Default = 'Melee',
+        Function = function(Val)
+            if Val == 'Melee' then
+                Weapons.Object.Visible = true
+                RangedWeapons.Object.Visible = false
+            elseif Val == 'Ranged' then
+                Weapons.Object.Visible = false
+                RangedWeapons.Object.Visible = true
+            end
+
+            C[4] = Val;
         end
     })
 
@@ -1737,6 +1789,8 @@ elseif game.PlaceId == 4620170611 then
 
     Tools.Object.Visible = false
     Weapons.Object.Visible = false
+    RangedWeapons.Object.Visible = false
+    IsDoingRanged.Object.Visible = false
 
 
     local CatagoryDrop = GiveItemTool.CreateDropdown({
@@ -1753,18 +1807,31 @@ elseif game.PlaceId == 4620170611 then
                 HowManySlider.Object.Visible = true
                 Weapons.Object.Visible = false
                 Tools.Object.Visible = false
+                RangedWeapons.Object.Visible = false
+                IsDoingRanged.Object.Visible = false
                 SetDropdownItem(Tools, C[1])
             elseif Val == 'Weapons' then
                 Foods.Object.Visible = false
                 HowManySlider.Object.Visible = false
-                Weapons.Object.Visible = true
                 Tools.Object.Visible = false
+                IsDoingRanged.Object.Visible = true
+
+                if (C[4] == 'Melee') then
+                    Weapons.Object.Visible = true
+                    RangedWeapons.Object.Visible = false
+                elseif (C[4] == 'Ranged') then
+                    Weapons.Object.Visible = false
+                    RangedWeapons.Object.Visible = true
+                end
+
                 SetDropdownItem(Tools, C[1])
             elseif Val == 'Tools' then
                 Foods.Object.Visible = false
                 HowManySlider.Object.Visible = false
                 Weapons.Object.Visible = false
                 Tools.Object.Visible = true
+                RangedWeapons.Object.Visible = false
+                IsDoingRanged.Object.Visible = false
                 SetDropdownItem(Tools, C[1])
             end
 
@@ -1780,22 +1847,29 @@ elseif game.PlaceId == 4620170611 then
     local RemoveToolFromInventorySettings = {[1] = '', BackPack = {}, BackpackForList = {}}
 
 
-    local RemoveToolFromInventory = Utility.CreateOptionsButton({
+    RemoveToolFromInventory = Utility.CreateOptionsButton({
         Name = 'RemoveFromBackpack',
-        Function = function()
-            if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
-                RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]]:Destroy()
-
+        Function = function(Callback)
+            if Callback then
                 if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
+                    RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]]:Destroy()
                     RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
+
+                    if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
+                        RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
+                    end
                 end
+
+                RemoveToolFromInventory['ToggleButton'](false)
             end
-        end
+        end,
+        HoverText = '[WARNING]: THIS MODULE IS WONDER DEV, SO, BUGS ARE EXSPECTED.'
     })
 
 
     for a, b in lplr:WaitForChild('Backpack', 60):GetChildren() do
         RemoveToolFromInventorySettings.BackPack[b.Name] = b
+        table.insert(RemoveToolFromInventorySettings.BackpackForList, b.Name)
     end
 
     print(RemoveToolFromInventory)
@@ -1820,6 +1894,37 @@ elseif game.PlaceId == 4620170611 then
 
 
 
+    local SearchForItem = RemoveToolFromInventory.CreateTextBox({
+        TempText = 'Type the name of the Item you want to remove.',
+        Name = 'Search',
+        FocusLost = function(Val)
+            RemoveToolFromInventorySettings[1] = Val
+        end
+    })
+
+
+    SearchForItem.Object.Visible = false
+
+
+    RemoveToolFromInventory.CreateDropdown({
+        Name = 'Method',
+        List = {
+            'Dropdown',
+            'SearchBar'
+        },
+        Function = function(Val)
+            if Val == 'SearchBar' then
+                SearchForItem.Object.Visible = true
+                DropdownListForBackpack.Object.Visible = false
+            else
+                SearchForItem.Object.Visible = false
+                DropdownListForBackpack.Object.Visible = true
+            end
+        end,
+        Default = 'Dropdown'
+    })
+
+
     local function UpdateBackpackPlayerList(newList)
         DropdownListForBackpack.UpdateList(newList)
     end
@@ -1836,11 +1941,10 @@ elseif game.PlaceId == 4620170611 then
 
     lplr:WaitForChild('Backpack', 60).ChildRemoved:Connect(function(child)
         -- see if the item is still in the players inventory
-        if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) then
+        if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) or lplr.Character:FindFirstChild(child.Name) then
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         else
-            RemoveToolFromInventorySettings.BackPack[child.Name] = nil
-            table.insert(RemoveToolFromInventorySettings.BackpackForList, child.Name)
+            table.remove(RemoveToolFromInventorySettings.BackpackForList, child.Name)
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         end
     end)
@@ -1850,7 +1954,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
 
 if a then
     a()
