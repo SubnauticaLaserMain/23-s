@@ -1570,13 +1570,86 @@ elseif game.PlaceId == 4620170611 then
             A[2] = Val
         end
     })
+
+
+    local FoodsSale = {
+        'Apple',
+        'Cookie',
+        'Chips',
+        'Bloxy Cola',
+        'Small Pizza',
+        'Normal Pizza',
+        'Large Pizza',
+        'Lollipop'
+    }
+
+
+    local TranslateFoods = {
+        ['Apple'] = 'Apple',
+        ['Cookie'] = 'Cookie',
+        ['Chips'] = 'Chips',
+        ['BloxyCola'] = 'BloxyCola',
+        ['Small Pizza'] = 'Pizza1',
+        ['Normal Pizza'] = 'Pizza2',
+        ['Large Pizza'] = 'Pizza3',
+        ['Lollipop'] = 'Lollipop'
+    }
+
+
+
+    local GiveItemTool = {['Enabled'] = false}
+
+    local C = {[1] = 'Apple', [2] = 1, [3] = 'Foods'}
+
+
+    local function GiveFoodRemote()
+        local Events = GetEventsFolder()
+        local GiveTool = Events:WaitForChild('GiveTool', 60)
+
+        return GiveTool
+    end
+
+
+    GiveItemTool = Blatant.CreateOptionsButton({
+        Name = 'GiveItem',
+        Function = function(Callback)
+            if Callback then
+                local Remote = GiveFoodRemote()
+                if (C[3] == 'Foods' or C[3] == 'Items') then
+                    if (C[2] > 1) then
+                        for i = 0, (C[2] - 1) do
+                            Remote:FireServer(table.unpack({
+                                [1] = C[1]
+                            }))
+                        end
+                    else
+                        Remote:FireServer(table.unpack({
+                            [1] = C[1]
+                        }))
+                    end
+                elseif (C[3] == 'Weapons') then
+
+                end
+            end
+        end
+    })
+
+
+    local Foods = GiveItemTool.CreateDropdown({
+        Name = 'Foods',
+        List = FoodsSale,
+        HoverText = 'Select the food you want to be given.',
+        Function = function(Val)
+            C[1] = TranslateFoods[Val];
+        end
+    })
 end
 
 shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/owp.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
 
 if a then
     a()
