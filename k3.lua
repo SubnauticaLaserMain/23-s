@@ -1615,7 +1615,7 @@ elseif game.PlaceId == 4620170611 then
         Function = function(Callback)
             if Callback then
                 local Remote = GiveFoodRemote()
-                if (C[3] == 'Foods' or C[3] == 'Items') then
+                if (C[3] == 'Foods' or C[3] == 'Tools') then
                     if (C[2] > 1) then
                         for i = 0, (C[2] - 1) do
                             Remote:FireServer(table.unpack({
@@ -1630,6 +1630,8 @@ elseif game.PlaceId == 4620170611 then
                 elseif (C[3] == 'Weapons') then
 
                 end
+
+                GiveItemTool['ToggleButton'](false)
             end
         end
     })
@@ -1642,6 +1644,36 @@ elseif game.PlaceId == 4620170611 then
         Function = function(Val)
             C[1] = TranslateFoods[Val];
         end
+    })
+
+
+    local HowManySlider = GiveItemTool.CreateSlider({
+        Name = 'Amount',
+        Min = 1,
+        Max = 50,
+        Function = function(val)
+            C[2] = val;
+        end,
+        HoverText = 'The Amount of that item you will get.'
+    })
+
+
+    local CatagoryDrop = GiveItemTool.CreateDropdown({
+        Name = 'Catagory',
+        List = {
+            'Foods',
+            'Weapons',
+            'Tools'
+        },
+        Default = 'Foods',
+        Function = function(Val)
+            if Val ~= 'Foods' then
+                HowManySlider.Object.Visible = false
+                Foods.Object.Visible = false
+            end
+            C[3] = Val;
+        end,
+        HoverText = 'Select the Catagory, you want to sort items from.'
     })
 end
 
