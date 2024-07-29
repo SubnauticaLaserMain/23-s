@@ -1799,7 +1799,6 @@ elseif game.PlaceId == 4620170611 then
     local DropdownListForBackpack = RemoveToolFromInventory.CreateDropdown({
         Name = 'Backpack',
         List = RemoveToolFromInventorySettings.BackPack,
-        Default = '',
         HoverText = 'Select the item you want to remove from your inventory',
         Function = function(Val)
             RemoveToolFromInventorySettings[1] = Val
@@ -1812,6 +1811,7 @@ elseif game.PlaceId == 4620170611 then
         return RemoveToolFromInventory.UpdateList(newList)
     end
 
+    UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackPack)
 
     lplr:WaitForChild('Backpack', 60).ChildAdded:Connect(function(child)
         if not RemoveToolFromInventorySettings.BackPack[child.Name] then
