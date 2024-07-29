@@ -17,6 +17,33 @@ local function calculateDistance(pos1, pos2)
     return (pos1 - pos2).Magnitude
 end
 
+
+
+local function SendNotitfication(title, text, delay)
+    local suc, res = pcall(function()
+        local frame = GuiLibrary.CreateNotification(title, text, delay)
+
+        return frame
+    end)
+
+    return (suc and res)
+end
+
+
+local function SendWarningNotification(title, text, delay)
+    local suc, res = pcall(function()
+        local frame = GuiLibrary.CreateNotification(title, text, delay, 'assets/WarningNotification.png')
+        
+        frame.Frame.Frame.ImageColor3 = Color3.fromRGB(236, 129, 44)
+
+        return frame
+    end)
+
+    return (suc and res)
+end
+
+
+
 local function findNearestEntity(playerPosition, entityList)
     local nearestEntity = nil
     local nearestDistance = math.huge
@@ -55,6 +82,18 @@ local function FetchPlayerCharacter()
         return Character
     end
 end
+
+
+local function FetchHumanoid()
+    local Character = FetchPlayerCharacter()
+
+
+    return Character:WaitForChild('Humanoid', 60)
+end
+
+
+
+
 
 
 local function fetchPlayerHumanoidRootPart(player)
@@ -140,36 +179,6 @@ if game.PlaceId == 13864667823 then
     local function Train(Ability)
         return GetEventsFolder():WaitForChild('RainbowWhatStat'):FireServer(Ability)
     end
-
-
-
-
-    local function SendNotitfication(title, text, delay)
-        local suc, res = pcall(function()
-            local frame = GuiLibrary.CreateNotification(title, text, delay)
-
-            return frame
-        end)
-
-        return (suc and res)
-    end
-
-
-    local function SendWarningNotification(title, text, delay)
-        local suc, res = pcall(function()
-            local frame = GuiLibrary.CreateNotification(title, text, delay, 'assets/WarningNotification.png')
-            
-            frame.Frame.Frame.ImageColor3 = Color3.fromRGB(236, 129, 44)
-
-            return frame
-        end)
-
-        return (suc and res)
-    end
-
-
-
-
 
 
 
@@ -1638,6 +1647,8 @@ elseif game.PlaceId == 4620170611 then
     }
 
 
+    TranslateTools = ToolsTable
+
 
     local GiveItemTool = {['Enabled'] = false}
 
@@ -1946,13 +1957,260 @@ elseif game.PlaceId == 4620170611 then
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         end
     end)
+
+
+
+    local function NotifyCode()
+        local CodeNote = Workspace:WaitForChild('CodeNote', 60)
+
+        if CodeNote then
+            local M = CodeNote:WaitForChild('SurfaceGui', 60)
+
+            if M then
+                local U = M:WaitForChild('TextLabel', 60)
+
+                if U then
+                    SendNotitfication('Safe Code', "The code is '" .. tostring(U.Text) .. "'.")
+                end
+            end
+        end
+    end
+
+
+    SC = Utility.CreateOptionsButton({
+        Name = 'GetSafeCode',
+        Function = function(Callback)
+            if Callback then
+                NotifyCode()
+
+                SC['ToggleButton'](false)
+            end
+        end
+    })
+
+    
+    local function getBadGuysFolder()
+        local Folder = Workspace:WaitForChild('BadGuys', 60)
+
+        return Folder
+    end
+
+
+    local Others = {
+        ['Damage'] = 3
+    }
+
+
+    local function hitNearestBadGuy(maxRange)
+        local Players = game:GetService("Players")
+        local lplr = Players.LocalPlayer
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local HitBadguyEvent = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("HitBadguy")
+
+        local character = lplr.Character or lplr.CharacterAdded:Wait()
+        local HRP = character:WaitForChild("HumanoidRootPart")
+        local playerPosition = HRP.Position
+
+        local badGuysFolder = getBadGuysFolder()
+        local badGuyModels = badGuysFolder:GetChildren()
+
+        local badGuyEntities = {}
+        for _, badGuy in ipairs(badGuyModels) do
+            if badGuy and badGuy and badGuy:IsA("Model") and badGuy.Name == " " and badGuy:FindFirstChild("HumanoidRootPart") then
+                table.insert(badGuyEntities, badGuy:FindFirstChild("HumanoidRootPart"))
+            end
+        end
+
+
+        if (Workspace:FindFirstChild('PizzaBossAlec') and Workspace:FindFirstChild('PizzaBossAlec'):FindFirstChild('BadGuyPizza') and Workspace:FindFirstChild('PizzaBossAlec'):FindFirstChild('BadGuyPizza'):FindFirstChild('HumanoidRootPart')) then
+            table.insert(badGuyEntities, Workspace:FindFirstChild('PizzaBossAlec'):FindFirstChild('BadGuyPizza'):FindFirstChild('HumanoidRootPart'))
+        end
+
+
+        
+        local function calculateDistance(pos1, pos2)
+            return (pos1 - pos2).Magnitude
+        end
+
+
+        local function findNearestEntity(playerPosition, entityList)
+            local nearestEntity = nil
+            local nearestDistance = math.huge
+
+            for _, entity in ipairs(entityList) do
+                local entityPosition = entity.Position
+                local dist = calculateDistance(playerPosition, entityPosition)
+                if dist < nearestDistance then
+                    nearestEntity = entity
+                    nearestDistance = dist
+                end
+            end
+
+            return nearestEntity, nearestDistance
+        end
+
+        local nearestBadGuy, nearestDistance = findNearestEntity(playerPosition, badGuyEntities)
+
+        if nearestBadGuy and nearestDistance <= maxRange then
+            local args = {
+                [1] = nearestBadGuy.Parent,
+                [2] = Others['Damage'],
+                [3] = 1
+            }
+            HitBadguyEvent:FireServer(table.unpack(args))
+
+            if (badGuy and badGuy.Parent) then
+                local Hum = badGuy.Parent:FindFirstChild('Humanoid')
+
+                if Hum then
+                    if Hum.Health == 5 then
+                        local args = {
+                            [1] = badGuy.Parent,
+                            [2] = 996
+                        }
+                        
+                        HitBadguyEvent:FireServer(unpack(args))
+                    end
+                end
+            end
+        else
+        end
+    end
+
+
+
+    local KillAuraSettings = {
+        ['Range'] = 10;
+        ['HitsPerSecond'] = 2;
+        ['WaitTime'] = 0.3;
+        ['AnimationTurn'] = 1,
+        ['DoingSwingAnimation'] = false;
+        ['Multi-Aura'] = false;
+    }
+
+
+
+
+    local KillAura = Combat.CreateOptionsButton({
+        Name = 'KillAura',
+        Function = function(Callback)
+            enabled = Callback
+            if Callback then
+                while true do
+                    if enabled then
+                        if KillAuraSettings['Multi-Aura'] == true then
+--                            hitMultipleBadGuys(KillAuraSettings['Range'])
+                            hitNearestBadGuy(KillAuraSettings['Range'])
+                        else
+                            hitNearestBadGuy(KillAuraSettings['Range'])
+                        end
+                    end
+
+                    --[[ If the swing animation setting is enabled, handle the animation ]]
+                    if KillAuraSettings['DoingSwingAnimation'] == true then
+                        local Turn = KillAuraSettings['AnimationTurn']
+                        local Humanoid = FetchHumanoid()
+                        local Weapon = FetchPlayerCharacter():FindFirstChildOfClass('Tool')
+                        if Weapon then
+                            local oldWeapon = Weapon
+                            Weapon = Weapon:FindFirstChild('Level41') 
+                                or Weapon:FindFirstChild('Level42') 
+                                or Weapon:FindFirstChild('Level51') 
+                                or Weapon:FindFirstChild('Level52')
+
+                            if Weapon then
+                                if Turn == 1 then
+                                    KillAuraSettings['AnimationTurn'] = 2
+                                    local FirstAnimation = oldWeapon:WaitForChild('Level42')
+                                    local track = Humanoid:LoadAnimation(FirstAnimation)
+                                    track:Play()
+                                else
+                                    KillAuraSettings['AnimationTurn'] = 1
+                                    local SecondAnimation = oldWeapon:WaitForChild('Level52')
+                                    local track = Humanoid:LoadAnimation(SecondAnimation)
+                                    track:Play()
+                                end
+                            end
+                        end    
+                    end
+
+                    --[[ If KillAura is disabled, exit the loop ]]
+                    if not enabled then
+                        return
+                    end
+
+                    --[[ Wait for the specified time before the next iteration ]]
+                    task.wait(KillAuraSettings['WaitTime'])
+                end
+            end
+        end
+    })
+
+
+
+
+    KillAura.CreateSlider({
+        Name = 'Wait Time',
+        Min = 1,
+        Max = 10,
+        Function = function(val) 
+            KillAuraSettings['WaitTime'] = val / 10
+        end,
+        HoverText = 'How many miliseconds it takes before another hit.',
+        Default = 3,
+        Double = 1 
+    })
+
+
+    KillAura.CreateSlider({
+        Name = 'Range',
+        Min = 10,
+        Max = 150,
+        Function = function(val)
+            KillAuraSettings['Range'] = val
+        end,
+        HoverText = 'The Range of the KillAura.',
+        Default = 10,
+        Double = 1
+    })
+
+
+    KillAura.CreateSlider({
+        Name = 'Damage',
+        Min = 1,
+        Max = 100,
+        HoverText = 'The Damage that the KillAura will do. For each enemy. That the KillAura attacks.',
+        Function = function(val)
+            Others['Damage'] = val
+        end,
+        Default = 3,
+        Double = 1
+    })
+
+
+    KillAura.CreateToggle({
+        Name = 'Swing',
+        HoverText = 'Makes your Weapon swing when the KillAura kills an Enemy.',
+        Function = function(val)
+            KillAuraSettings['DoingSwingAnimation'] = val
+        end
+    })
+
+
+    KillAura.CreateToggle({
+        Name = 'Multi-Aura',
+        HoverText = 'Should target more than 1 bad guy at once.',
+        Function = function(val)
+            KillAuraSettings['Multi-Aura'] = val
+        end
+    })
 end
 
 shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
 
 if a then
     a()
