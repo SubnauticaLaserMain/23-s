@@ -101,6 +101,15 @@ local World = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api
 local enabled = false
 
 
+
+
+local function SetDropdownItem(DropdownObject, Item)
+    DropdownObject.Value = Item
+end
+
+
+
+
 if game.PlaceId == 13864667823 then
     local function getBadGuysFolder()
         local Folder = Workspace:WaitForChild('BadGuys', 60)
@@ -1724,16 +1733,22 @@ elseif game.PlaceId == 4620170611 then
                 HowManySlider.Object.Visible = true
                 Weapons.Object.Visible = false
                 Tools.Object.Visible = false
+                C[1] = 'Apple'
+                SetDropdownItem(Tools, C[1])
             elseif Val == 'Weapons' then
                 Foods.Object.Visible = false
                 HowManySlider.Object.Visible = false
                 Weapons.Object.Visible = true
                 Tools.Object.Visible = false
+                C[1] = 'Bat'
+                SetDropdownItem(Tools, C[1])
             elseif Val == 'Tools' then
                 Foods.Object.Visible = false
                 HowManySlider.Object.Visible = false
                 Weapons.Object.Visible = false
                 Tools.Object.Visible = true
+                C[1] = 'Key'
+                SetDropdownItem(Tools, C[1])
             end
 
 
