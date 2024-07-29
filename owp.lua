@@ -101,6 +101,15 @@ local World = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api
 local enabled = false
 
 
+
+
+local function SetDropdownItem(DropdownObject, Item)
+    DropdownObject.Value = Item
+end
+
+
+
+
 if game.PlaceId == 13864667823 then
     local function getBadGuysFolder()
         local Folder = Workspace:WaitForChild('BadGuys', 60)
@@ -1530,25 +1539,27 @@ elseif game.PlaceId == 4620170611 then
 
     -- game:GetService("ReplicatedStorage").RemoteEvents.BasementMission:FireServer()
 
-    local A = {[1] = false, [2] = true}
+    local B = {[1] = false, [2] = true}
 
     BlatantTurnOnPC = Blatant.CreateOptionsButton({
         Name = 'Turn on PC',
         Function = function(Callback)
-            if A[1] then
-                game:GetService("ReplicatedStorage").RemoteEvents.BasementMission:FireServer()
-            end
+            if Callback then
+                if B[1] then
+                    game:GetService("ReplicatedStorage").RemoteEvents.BasementMission:FireServer()
+                end
 
-            if A[2] then
-                local args = {
-                    [1] = 1,
-                    [2] = "Completed"
-                }
-                
-                game:GetService("ReplicatedStorage").RemoteEvents.PCCamera:FireServer(unpack(args))
-            end
+                if B[2] then
+                    local args = {
+                        [1] = 1,
+                        [2] = "Completed"
+                    }
+                    
+                    game:GetService("ReplicatedStorage").RemoteEvents.PCCamera:FireServer(unpack(args))
+                end
 
-            BlatantTurnOnPC['ToggleButton'](false)
+                BlatantTurnOnPC['ToggleButton'](false)
+            end
         end
     })
 
@@ -1568,13 +1579,263 @@ elseif game.PlaceId == 4620170611 then
             A[2] = Val
         end
     })
+
+
+    local FoodsSale = {
+        'Apple',
+        'Cookie',
+        'Chips',
+        'Bloxy Cola',
+        'Small Pizza',
+        'Normal Pizza',
+        'Large Pizza',
+        'Lollipop'
+    }
+
+
+    local TranslateFoods = {
+        ['Apple'] = 'Apple',
+        ['Cookie'] = 'Cookie',
+        ['Chips'] = 'Chips',
+        ['BloxyCola'] = 'BloxyCola',
+        ['Small Pizza'] = 'Pizza1',
+        ['Normal Pizza'] = 'Pizza2',
+        ['Large Pizza'] = 'Pizza3',
+        ['Lollipop'] = 'Lollipop'
+    }
+
+
+
+    local TranslateTools = {
+        ['Key'] = 'Key'
+    }
+
+
+    local WeaponsTrasnlate = {
+        ['Bat'] = 'Bat',
+        ['Wrench'] = 'Wrench',
+        ['Crowbar'] = 'Crowbar',
+        ['Broom'] = 'Broom',
+        ['Hammer'] = 'Hammer',
+        ['Pitchfork'] = 'Pitchfork',
+        ['Ice Breaker'] = 'Breaker',
+        ['Toy Sword'] = 'Sword',
+        ['Gun'] = 'Gun',
+        ['Swat Gun'] = 'SwatGun'
+    }
+
+
+
+    local GiveItemTool = {['Enabled'] = false}
+
+    local C = {[1] = 'Apple', [2] = 1, [3] = 'Foods'}
+
+
+    local function GiveFoodRemote()
+        local Events = GetEventsFolder()
+        local GiveTool = Events:WaitForChild('GiveTool', 60)
+
+        return GiveTool
+    end
+
+    local function GiveWeaponRemote()
+        local Events = GetEventsFolder()
+        local GiveWeapon = Events:WaitForChild('BasementWeapon', 60)
+
+        return GiveWeapon
+    end
+
+
+    GiveItemTool = Blatant.CreateOptionsButton({
+        Name = 'GiveItem',
+        Function = function(Callback)
+            if Callback then
+                local Remote = GiveFoodRemote()
+                local WeaponR = GiveWeaponRemote()
+
+                if (C[3] == 'Foods' or C[3] == 'Tools') then
+                    if (C[2] > 1) then
+                        for i = 0, (C[2] - 1) do
+                            Remote:FireServer(table.unpack({
+                                [1] = C[1]
+                            }))
+                        end
+                    else
+                        Remote:FireServer(table.unpack({
+                            [1] = C[1]
+                        }))
+                    end
+                elseif (C[3] == 'Weapons') then
+                    if (C[1]) then
+                        WeaponR:FireServer(table.unpack({
+                            [1] = true,
+                            [2] = C[1]
+                        }))
+                    end
+                end
+
+                GiveItemTool['ToggleButton'](false)
+            end
+        end
+    })
+
+
+    local Foods = GiveItemTool.CreateDropdown({
+        Name = 'Foods',
+        List = FoodsSale,
+        HoverText = 'Select the food you want to be given.',
+        Function = function(Val)
+            C[1] = TranslateFoods[Val];
+        end
+    })
+
+
+    local Tools = GiveItemTool.CreateDropdown({
+        Name = 'Tools',
+        List = {
+            'Key',
+
+        },
+        HoverText = 'Select the tool you want to be given.',
+        Function = function(Val)
+            C[1] = Val
+        end
+    })
+
+    local Weapons = GiveItemTool.CreateDropdown({
+        Name = 'Weapons',
+        List = {
+            'Bat',
+            'Wrench',
+            'Crowbar',
+            'Broom',
+            'Hammer',
+            'Pitchfork',
+            'Ice Breaker',
+            'Toy Sword',
+            'Gun',
+            'Swat Gun'
+        },
+        Default = 'Bat',
+        HoverText = 'Select the weapon you want to be given.',
+        Function = function(Val)
+            C[1] = Val
+        end
+    })
+
+
+    local HowManySlider = GiveItemTool.CreateSlider({
+        Name = 'Amount',
+        Min = 1,
+        Max = 50,
+        Function = function(val)
+            C[2] = val;
+        end,
+        HoverText = 'The Amount of that item you will get.'
+    })
+
+
+    Tools.Object.Visible = false
+    Weapons.Object.Visible = false
+
+
+    local CatagoryDrop = GiveItemTool.CreateDropdown({
+        Name = 'Catagory',
+        List = {
+            'Foods',
+            'Weapons',
+            'Tools'
+        },
+        Default = 'Foods',
+        Function = function(Val)
+            if Val == 'Foods' then
+                Foods.Object.Visible = true
+                HowManySlider.Object.Visible = true
+                Weapons.Object.Visible = false
+                Tools.Object.Visible = false
+                SetDropdownItem(Tools, C[1])
+            elseif Val == 'Weapons' then
+                Foods.Object.Visible = false
+                HowManySlider.Object.Visible = false
+                Weapons.Object.Visible = true
+                Tools.Object.Visible = false
+                SetDropdownItem(Tools, C[1])
+            elseif Val == 'Tools' then
+                Foods.Object.Visible = false
+                HowManySlider.Object.Visible = false
+                Weapons.Object.Visible = false
+                Tools.Object.Visible = true
+                SetDropdownItem(Tools, C[1])
+            end
+
+
+            C[3] = Val;
+        end,
+        HoverText = 'Select the Catagory, you want to sort items from.'
+    })
+
+
+
+    local RemoveToolFromInventory = {['Value'] = ''}
+
+    local RemoveToolFromInventorySettings = {[1] = '', BackPack = {}}
+
+
+    RemoveToolFromInventory = Utility.CreateOptionsButton({
+        Name = 'RemoveFromBackpack',
+        Function = function()
+            if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
+                RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]]:Destroy()
+
+                if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
+                    RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
+                end
+            end
+        end
+    })
+
+
+
+    local DropdownListForBackpack = RemoveToolFromInventory.CreateDropdown({
+        Name = 'Backpack',
+        List = RemoveToolFromInventorySettings.BackPack,
+        Default = '',
+        HoverText = 'Select the item you want to remove from your inventory',
+        Function = function(Val)
+            RemoveToolFromInventorySettings[1] = Val
+        end
+    })
+
+
+
+    local function UpdateBackpackPlayerList(newList)
+        return RemoveToolFromInventory.UpdateList(newList)
+    end
+
+
+    lplr:WaitForChild('Backpack', 60).ChildAdded:Connect(function(child)
+        if not RemoveToolFromInventorySettings.BackPack[child.Name] then
+            RemoveToolFromInventorySettings.BackPack[child.Name] = child
+            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackPack)
+        end
+    end)
+
+    lplr:WaitForChild('Backpack', 60).ChildRemoved:Connect(function(child)
+        -- see if the item is still in the players inventory
+        if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) then
+            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackPack)
+        else
+            RemoveToolFromInventorySettings.BackPack[child.Name] = nil
+            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackPack)
+        end
+    end)
 end
 
 shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/owp.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
 
 if a then
     a()
@@ -1582,9 +1843,10 @@ else
     print(b)
 end
 ]]
-
+--[[
 for i, v in game:GetService('Workspace'):WaitForChild('TheHouse'):GetDescendants() do
     if v and v.ClassName == 'ClickDetector' then
         print(v.Name .. ' found in : ' .. tostring(v:GetFullName()))
     end
 end
+]]
