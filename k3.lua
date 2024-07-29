@@ -1589,7 +1589,8 @@ elseif game.PlaceId == 4620170611 then
         'Small Pizza',
         'Normal Pizza',
         'Large Pizza',
-        'Lollipop'
+        'Lollipop',
+        'Poisonous Pizza'
     }
 
 
@@ -1601,7 +1602,8 @@ elseif game.PlaceId == 4620170611 then
         ['Small Pizza'] = 'Pizza1',
         ['Normal Pizza'] = 'Pizza2',
         ['Large Pizza'] = 'Pizza3',
-        ['Lollipop'] = 'Lollipop'
+        ['Lollipop'] = 'Lollipop',
+        ['Poisonous Pizza'] = 'EpicPizza',
     }
 
 
@@ -1623,6 +1625,16 @@ elseif game.PlaceId == 4620170611 then
         ['Gun'] = 'Gun',
         ['Swat Gun'] = 'SwatGun',
         ['Sword'] = 'LinkedSword'
+    }
+
+
+    local ToolsTable = {
+        ['Key'] = 'Key',
+        ['Med Kit'] = 'MedKit',
+        ['Cure'] = 'Cure',
+        ['Car Key'] = 'CarKey',
+        ['Louie'] = 'Louie',
+        ['Teddy Bear'] = 'TeddyBloxpin',
     }
 
 
@@ -1695,11 +1707,15 @@ elseif game.PlaceId == 4620170611 then
         Name = 'Tools',
         List = {
             'Key',
-
+            'Cure',
+            'Med Kit',
+            'Car Key',
+            'Louie',
+            'Teddy Bear',
         },
         HoverText = 'Select the tool you want to be given.',
         Function = function(Val)
-            C[1] = Val
+            C[1] = TranslateTools[Val]
         end
     })
 
@@ -1923,7 +1939,7 @@ elseif game.PlaceId == 4620170611 then
 
     lplr:WaitForChild('Backpack', 60).ChildRemoved:Connect(function(child)
         -- see if the item is still in the players inventory
-        if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) then
+        if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) or lplr.Character:FindFirstChild(child.Name) then
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         else
             RemoveToolFromInventorySettings.BackpackForList[child.Name] = nil
@@ -1936,7 +1952,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
 
 if a then
     a()
