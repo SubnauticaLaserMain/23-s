@@ -1597,6 +1597,13 @@ elseif game.PlaceId == 4620170611 then
 
 
 
+    local TranslateTools = {
+        ['Key'] = 'Key'
+    }
+
+
+
+
     local GiveItemTool = {['Enabled'] = false}
 
     local C = {[1] = 'Apple', [2] = 1, [3] = 'Foods'}
@@ -1609,12 +1616,21 @@ elseif game.PlaceId == 4620170611 then
         return GiveTool
     end
 
+    local function GiveWeaponRemote()
+        local Events = GetEventsFolder()
+        local GiveWeapon = Events:WaitForChild('BasementWeapon', 60)
+
+        return GiveWeapon
+    end
+
 
     GiveItemTool = Blatant.CreateOptionsButton({
         Name = 'GiveItem',
         Function = function(Callback)
             if Callback then
                 local Remote = GiveFoodRemote()
+                local WeaponR = GiveWeaponRemote()
+
                 if (C[3] == 'Foods' or C[3] == 'Tools') then
                     if (C[2] > 1) then
                         for i = 0, (C[2] - 1) do
@@ -1628,7 +1644,12 @@ elseif game.PlaceId == 4620170611 then
                         }))
                     end
                 elseif (C[3] == 'Weapons') then
-
+                    if (C[1]) then
+                        WeaponR:FireServer(table.unpack({
+                            [1] = true,
+                            [2] = C[1]
+                        }))
+                    end
                 end
 
                 GiveItemTool['ToggleButton'](false)
@@ -1647,6 +1668,33 @@ elseif game.PlaceId == 4620170611 then
     })
 
 
+    local Tools = GiveItemTool.CreateDropdown({
+        Name = 'Tools',
+        List = {
+            'Key',
+
+        },
+        HoverText = 'Select the tool you want to be given.',
+        Function = function(Val)
+            C[1] = Val
+        end
+    })
+
+    local Weapons = GiveItemTool.CreateDropdown({
+        Name = 'Weapons',
+        List = {
+            'Bat',
+            'Wrench',
+            'Crowbar',
+        },
+        Default = 'Bat',
+        HoverText = 'Select the weapon you want to be given.',
+        Function = function(Val)
+            C[1] = Val
+        end
+    })
+
+
     local HowManySlider = GiveItemTool.CreateSlider({
         Name = 'Amount',
         Min = 1,
@@ -1658,6 +1706,10 @@ elseif game.PlaceId == 4620170611 then
     })
 
 
+    Tools.Object.Visible = false
+    Weapons.Object.Visible = false
+
+
     local CatagoryDrop = GiveItemTool.CreateDropdown({
         Name = 'Catagory',
         List = {
@@ -1667,10 +1719,24 @@ elseif game.PlaceId == 4620170611 then
         },
         Default = 'Foods',
         Function = function(Val)
-            if Val ~= 'Foods' then
-                HowManySlider.Object.Visible = false
+            if Val == 'Foods' then
+                Foods.Object.Visible = true
+                HowManySlider.Object.Visible = true
+                Weapons.Object.Visible = false
+                Tools.Object.Visible = false
+            elseif Val == 'Weapons' then
                 Foods.Object.Visible = false
+                HowManySlider.Object.Visible = false
+                Weapons.Object.Visible = true
+                Tools.Object.Visible = false
+            elseif Val == 'Tools' then
+                Foods.Object.Visible = false
+                HowManySlider.Object.Visible = false
+                Weapons.Object.Visible = false
+                Tools.Object.Visible = true
             end
+
+
             C[3] = Val;
         end,
         HoverText = 'Select the Catagory, you want to sort items from.'
