@@ -1942,7 +1942,7 @@ elseif game.PlaceId == 4620170611 then
         if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) or lplr.Character:FindFirstChild(child.Name) then
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         else
-            RemoveToolFromInventorySettings.BackpackForList[child.Name] = nil
+            table.remove(RemoveToolFromInventorySettings.BackpackForList, child.Name)
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         end
     end)
