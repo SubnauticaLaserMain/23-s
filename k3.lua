@@ -1773,6 +1773,49 @@ elseif game.PlaceId == 4620170611 then
         end,
         HoverText = 'Select the Catagory, you want to sort items from.'
     })
+
+
+
+    local RemoveToolFromInventory = {['Value'] = ''}
+
+    local RemoveToolFromInventorySettings = {[1] = '', BackPack = {}}
+
+
+    RemoveToolFromInventory = Utility.CreateOptionsButton({
+        Name = 'RemoveFromBackpack',
+        Function = function()
+            if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
+                RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]]:Destroy()
+
+                if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
+                    RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
+                end
+            end
+        end
+    })
+
+
+    local function UpdateBackpackPlayerList(newList)
+        return RemoveToolFromInventory.UpdateList(newList)
+    end
+
+
+    lplr:WaitForChild('Backpack', 60).ChildAdded:Connect(function(child)
+        if not RemoveToolFromInventorySettings.BackPack[child.Name] then
+            RemoveToolFromInventorySettings.BackPack[child.Name] = child
+            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackPack)
+        end
+    end)
+
+    lplr:WaitForChild('Backpack', 60).ChildRemoved:Connect(function(child)
+        -- see if the item is still in the players inventory
+        if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) then
+            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackPack)
+        else
+            RemoveToolFromInventorySettings.BackPack[child.Name] = nil
+            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackPack)
+        end
+    end)
 end
 
 shared.VapeManualLoad = true
