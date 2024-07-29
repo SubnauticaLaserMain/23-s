@@ -1795,10 +1795,24 @@ elseif game.PlaceId == 4620170611 then
     })
 
 
+
+    local DropdownListForBackpack = RemoveToolFromInventory.CreateDropdown({
+        Name = 'Backpack',
+        List = RemoveToolFromInventorySettings.BackPack,
+        Default = '',
+        HoverText = 'Select the item you want to remove from your inventory',
+        Function = function(Val)
+            RemoveToolFromInventorySettings[1] = Val
+        end
+    })
+
+
+
     local function UpdateBackpackPlayerList(newList)
         return RemoveToolFromInventory.UpdateList(newList)
     end
 
+    UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackPack)
 
     lplr:WaitForChild('Backpack', 60).ChildAdded:Connect(function(child)
         if not RemoveToolFromInventorySettings.BackPack[child.Name] then
@@ -1822,7 +1836,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/owp.lua', true))()
 
 if a then
     a()
