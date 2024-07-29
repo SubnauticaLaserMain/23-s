@@ -1509,6 +1509,65 @@ elseif game.PlaceId == 4620170611 then
         end,
         HoverText = 'Wish door will be affected.'
     })
+
+
+    local TurnOnBasementLights = {['Enabled'] = false}
+
+    TurnOnBasementLights = Utility.CreateOptionsButton({
+        Name = 'ActivateBasementLights',
+        Function = function(Callback)
+            if Callback then
+                game:GetService("ReplicatedStorage").RemoteEvents.BasementMission:FireServer()
+
+                TurnOnBasementLights['ToggleButton'](false)
+            end
+        end
+    })
+
+    
+
+    local BlatantTurnOnPC = {['Enabled'] = false}
+
+    -- game:GetService("ReplicatedStorage").RemoteEvents.BasementMission:FireServer()
+
+    local A = {[1] = false, [2] = true}
+
+    BlatantTurnOnPC = Blatant.CreateOptionsButton({
+        Name = 'Turn on PC',
+        Function = function(Callback)
+            if A[1] then
+                game:GetService("ReplicatedStorage").RemoteEvents.BasementMission:FireServer()
+            end
+
+            if A[2] then
+                local args = {
+                    [1] = 1,
+                    [2] = "Completed"
+                }
+                
+                game:GetService("ReplicatedStorage").RemoteEvents.PCCamera:FireServer(unpack(args))
+            end
+
+            BlatantTurnOnPC['ToggleButton'](false)
+        end
+    })
+
+
+    BlatantTurnOnPC.CreateToggle({
+        Name = 'DoLights',
+        Default = false,
+        Function = function(Val)
+            A[1] = Val
+        end
+    })
+
+    BlatantTurnOnPC.CreateToggle({
+        Name = 'TurnOnPC',
+        Default = true,
+        Function = function(Val)
+            A[2] = Val
+        end
+    })
 end
 
 shared.VapeManualLoad = true
@@ -1523,3 +1582,9 @@ else
     print(b)
 end
 ]]
+
+for i, v in game:GetService('Workspace'):WaitForChild('TheHouse'):GetDescendants() do
+    if v and v.ClassName == 'ClickDetector' then
+        print(v.Name .. ' found in : ' .. tostring(v:GetFullName()))
+    end
+end
