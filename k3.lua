@@ -1621,14 +1621,15 @@ elseif game.PlaceId == 4620170611 then
         ['Ice Breaker'] = 'Breaker',
         ['Toy Sword'] = 'Sword',
         ['Gun'] = 'Gun',
-        ['Swat Gun'] = 'SwatGun'
+        ['Swat Gun'] = 'SwatGun',
+        ['Sword'] = 'LinkedSword'
     }
 
 
 
     local GiveItemTool = {['Enabled'] = false}
 
-    local C = {[1] = 'Apple', [2] = 1, [3] = 'Foods'}
+    local C = {[1] = 'Apple', [2] = 1, [3] = 'Foods', [4] = 'Melee'}
 
 
     local function GiveFoodRemote()
@@ -1713,13 +1714,46 @@ elseif game.PlaceId == 4620170611 then
             'Pitchfork',
             'Ice Breaker',
             'Toy Sword',
+            'Sword'
+        },
+        Default = 'Bat',
+        HoverText = 'Select the melee weapon you want to be given.',
+        Function = function(Val)
+            C[1] = Val
+        end
+    })
+
+    local RangedWeapons = GiveItemTool.CreateDropdown({
+        Name = 'Weapons',
+        List = {
             'Gun',
             'Swat Gun'
         },
-        Default = 'Bat',
-        HoverText = 'Select the weapon you want to be given.',
+        Default = 'Gun',
+        HoverText = 'Select the ranged weapon you want to be given.',
         Function = function(Val)
             C[1] = Val
+        end
+    })
+
+
+    local IsDoingRanged = GiveItemTool.CreateDropdown({
+        Name = 'WeaponType',
+        List = {
+            'Melee',
+            'Ranged'
+        },
+        Default = 'Melee',
+        Function = function(Val)
+            if Val == 'Melee' then
+                Weapons.Object.Visible = true
+                RangedWeapons.Object.Visible = false
+            elseif Val == 'Ranged' then
+                Weapons.Object.Visible = false
+                RangedWeapons.Object.Visible = true
+            end
+
+            C[4] = Val;
         end
     })
 
@@ -1780,18 +1814,23 @@ elseif game.PlaceId == 4620170611 then
     local RemoveToolFromInventorySettings = {[1] = '', BackPack = {}, BackpackForList = {}}
 
 
-    local RemoveToolFromInventory = Utility.CreateOptionsButton({
+    RemoveToolFromInventory = Utility.CreateOptionsButton({
         Name = 'RemoveFromBackpack',
-        Function = function()
-            if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
-                RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]]:Destroy()
-                RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
-
+        Function = function(Callback)
+            if Callback then
                 if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
+                    RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]]:Destroy()
                     RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
+
+                    if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
+                        RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
+                    end
                 end
+
+                RemoveToolFromInventory['ToggleButton'](false)
             end
-        end
+        end,
+        HoverText = '[WARNING]: THIS MODULE IS WONDER DEV, SO, BUGS ARE EXSPECTED.'
     })
 
 
@@ -1882,7 +1921,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
 
 if a then
     a()
