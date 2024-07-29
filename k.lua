@@ -1719,7 +1719,7 @@ elseif game.PlaceId == 4620170611 then
         Default = 'Bat',
         HoverText = 'Select the melee weapon you want to be given.',
         Function = function(Val)
-            C[1] = Val
+            C[1] = WeaponsTrasnlate[Val]
         end
     })
 
@@ -1732,7 +1732,7 @@ elseif game.PlaceId == 4620170611 then
         Default = 'Gun',
         HoverText = 'Select the ranged weapon you want to be given.',
         Function = function(Val)
-            C[1] = Val
+            C[1] = WeaponsTrasnlate[Val]
         end
     })
 
@@ -1936,7 +1936,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
 
 if a then
     a()
