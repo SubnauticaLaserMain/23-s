@@ -1233,7 +1233,9 @@ if game.PlaceId == 13864667823 then
             end
 
             while (HealAllLoop == true) do
-                HealAllPlayers()
+                if not (lplr:WaitForChild('Backpack'):FindFirstChild('GoldenApple') or lplr.Character:FindFirstChild('GoldenApple')) then
+                    HealAllPlayers()
+                end
                 task.wait(3)
             end
 
@@ -1611,7 +1613,7 @@ elseif game.PlaceId == 4620170611 then
         Name = 'DoLights',
         Default = false,
         Function = function(Val)
-            A[1] = Val
+            B[1] = Val
         end
     })
 
@@ -1619,7 +1621,7 @@ elseif game.PlaceId == 4620170611 then
         Name = 'TurnOnPC',
         Default = true,
         Function = function(Val)
-            A[2] = Val
+            B[2] = Val
         end
     })
 
