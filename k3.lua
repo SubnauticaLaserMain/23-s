@@ -1944,7 +1944,7 @@ elseif game.PlaceId == 4620170611 then
                 local U = M:WaitForChild('TextLabel', 60)
 
                 if U then
-                    SendNotitfication('Safe Code', "The code is '" .. tostring(U.Text) .. "'.")
+                    SendNotitfication('Safe Code', "The code is '" .. tostring(U.Text) .. "'.", 6)
                 end
             end
         end
@@ -2032,17 +2032,17 @@ elseif game.PlaceId == 4620170611 then
             }
             HitBadguyEvent:FireServer(table.unpack(args))
 
-            if (badGuy and badGuy.Parent) then
-                local Hum = badGuy.Parent:FindFirstChild('Humanoid')
+            if (nearestBadGuy and nearestBadGuy.Parent) then
+                local Hum = nearestBadGuy.Parent:FindFirstChild('Humanoid')
 
                 if Hum then
                     if Hum.Health == 5 then
                         local args = {
-                            [1] = badGuy.Parent,
+                            [1] = nearestBadGuy.Parent,
                             [2] = 996
                         }
                         
-                        HitBadguyEvent:FireServer(unpack(args))
+                        HitBadguyEvent:FireServer(table.unpack(args))
                     end
                 end
             end
@@ -2086,9 +2086,9 @@ elseif game.PlaceId == 4620170611 then
                         local Weapon = FetchPlayerCharacter():FindFirstChildOfClass('Tool')
                         if Weapon then
                             local oldWeapon = Weapon
-                            Weapon = Weapon:FindFirstChild('Level41') 
-                                or Weapon:FindFirstChild('Level42') 
-                                or Weapon:FindFirstChild('Level51') 
+                            Weapon = Weapon:FindFirstChild('Level41')
+                                or Weapon:FindFirstChild('Level42')
+                                or Weapon:FindFirstChild('Level51')
                                 or Weapon:FindFirstChild('Level52')
 
                             if Weapon then
@@ -2175,6 +2175,55 @@ elseif game.PlaceId == 4620170611 then
         HoverText = 'Should target more than 1 bad guy at once.',
         Function = function(val)
             KillAuraSettings['Multi-Aura'] = val
+        end
+    })
+
+
+
+    local function GetBackpackItemIfAsync(ItemName)
+        local Backpack = lplr:WaitForChild('Backpack', 60)
+
+        if Backpack then
+            local IsItem = Backpack:FindFirstChild(ItemName)
+
+            if IsItem then
+                return IsItem
+            else
+                IsItem = FetchPlayerCharacter():FindFirstChild(ItemName)
+
+                if IsItem then
+                    return IsItem
+                end
+            end
+        end
+    end
+
+
+    UnlockBasementDoor = Blatant.CreateOptionsButton({
+        Name = 'UnlockBasementDoor',
+        Function = function(Callback)
+            if Callback then
+                local Key = GetBackpackItemIfAsync('Key')
+
+                if Key then
+                    FetchHumanoid():EquipTool(Key)
+                    task.wait(0.35)
+                    game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
+                else
+                    GiveFoodRemote():FireServer(table.unpack({
+                        [1] = 'Key'
+                    }))
+
+                    local newKey = GetBackpackItemIfAsync('Key')
+
+                    if newKey then
+                        game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
+                    end
+                end
+
+                SendNotitfication('UnlockBasementDoor', 'Successfully unlocked basement door.', 5)
+                UnlockBasementDoor['ToggleButton'](false)
+            end
         end
     })
 end
