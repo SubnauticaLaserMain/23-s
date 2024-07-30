@@ -1489,7 +1489,23 @@ elseif game.PlaceId == 4620170611 then
 
 
 
-    local A = {[1] = 1, [2] = 'Front'}
+    local A = {[1] = 1, [2] = 'Front', [3] = 'Opened'}
+
+
+    local function GetDoorOpened(DoorModel)
+        if DoorModel then
+            local Opened = DoorModel:FindFirstChild('Open')
+            local Close = DoorModel:FindFirstChild('Close')
+
+            if Opened and Opened.Transparency == 0 then
+                return 'Opened'
+            elseif Close and Close.Transparency == 0 then
+                return 'Closed'
+            end
+        end
+    end
+
+
 
     local AutoDoor = Utility.CreateOptionsButton({
         Name = 'AutoDoor',
@@ -1497,12 +1513,17 @@ elseif game.PlaceId == 4620170611 then
             getgenv().GetAutoDoorAllowed = Callback
             if Callback then
                 repeat
-                    DoDoorRemote(A[2])
+                    DoorTranslate = DoorTranslate or 1
+
+                    if GetDoorOpened(Workspace:FindFirstChild(A[2])) == A[3] then
+                        DoDoorRemote(A[2])
+                    end
                     task.wait(A[1])
                 until (not GetAutoDoorAllowed)
             end
         end
     })
+
 
 
     AutoDoor.CreateSlider({
@@ -1526,6 +1547,19 @@ elseif game.PlaceId == 4620170611 then
             A[2] = Val:gsub(' Door', '')
         end,
         HoverText = 'Wish door will be affected.'
+    })
+
+
+    AutoDoor.CreateDropdown({
+        Name = 'Door State',
+        List = {
+            'Opened',
+            'Closed'
+        },
+        Function = function(val)
+            A[3] = val
+        end,
+        Default = 'Opened'
     })
 
 
