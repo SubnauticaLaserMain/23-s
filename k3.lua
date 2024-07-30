@@ -1852,94 +1852,63 @@ elseif game.PlaceId == 4620170611 then
 
 
 
-
-    local RemoveToolFromInventorySettings = {[1] = '', BackPack = {}, BackpackForList = {}}
-
-
+    ---- 
+    local RemoveToolFromInventorySettings = {
+        [1] = '', 
+        BackPack = {}, 
+        BackpackForList = {}
+    }
+    
     RemoveToolFromInventory = Utility.CreateOptionsButton({
         Name = 'RemoveFromBackpack',
         Function = function(Callback)
             if Callback then
-                if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
-                    RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]]:Destroy()
-                    RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
-
-                    if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
-                        RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
+                local itemName = RemoveToolFromInventorySettings[1]
+                local item = RemoveToolFromInventorySettings['BackPack'][itemName]
+                
+                if item then
+                    item:Destroy()
+                    RemoveToolFromInventorySettings['BackPack'][itemName] = nil
+                    RemoveToolFromInventorySettings.BackpackForList = {}  -- Clear the list
+                    for itemName, item in pairs(RemoveToolFromInventorySettings['BackPack']) do
+                        table.insert(RemoveToolFromInventorySettings.BackpackForList, itemName)
                     end
                 end
-
+    
                 RemoveToolFromInventory['ToggleButton'](false)
             end
         end,
-        HoverText = '[WARNING]: THIS MODULE IS WONDER DEV, SO, BUGS ARE EXSPECTED.'
+        HoverText = '[WARNING]: THIS MODULE IS WONDER DEV, SO, BUGS ARE EXPECTED.'
     })
-
-
-    for a, b in lplr:WaitForChild('Backpack', 60):GetChildren() do
-        RemoveToolFromInventorySettings.BackPack[b.Name] = b
-        table.insert(RemoveToolFromInventorySettings.BackpackForList, b.Name)
+    
+    local function UpdateBackpackList()
+        RemoveToolFromInventorySettings.BackpackForList = {}
+        for itemName, _ in pairs(RemoveToolFromInventorySettings.BackPack) do
+            table.insert(RemoveToolFromInventorySettings.BackpackForList, itemName)
+        end
     end
+    
+    UpdateBackpackList()
 
-    print(RemoveToolFromInventory)
-
+    for _, item in ipairs(lplr:WaitForChild('Backpack', 60):GetChildren()) do
+        RemoveToolFromInventorySettings.BackPack[item.Name] = item
+        table.insert(RemoveToolFromInventorySettings.BackpackForList, item.Name)
+    end
+    
     local DropdownListForBackpack = RemoveToolFromInventory.CreateDropdown({
         Name = 'Backpack',
         List = RemoveToolFromInventorySettings.BackpackForList,
-        Default = (function()
-            for a, b in lplr:WaitForChild('Backpack', 60):GetChildren() do
-                if a and b then
-                    if a == 1 then
-                        return b.Name
-                    end
-                end
-            end
-        end)(),
+        Default = RemoveToolFromInventorySettings.BackpackForList[1],  -- Set a default value here
         HoverText = 'Select the item you want to remove from your inventory',
         Function = function(Val)
             RemoveToolFromInventorySettings[1] = Val
         end
     })
-
-
-
-    local SearchForItem = RemoveToolFromInventory.CreateTextBox({
-        TempText = 'Type the name of the Item you want to remove.',
-        Name = 'Search',
-        FocusLost = function(Val)
-            RemoveToolFromInventorySettings[1] = Val
-        end
-    })
-
-
-    SearchForItem.Object.Visible = false
-
-
-    RemoveToolFromInventory.CreateDropdown({
-        Name = 'Method',
-        List = {
-            'Dropdown',
-            'SearchBar'
-        },
-        Function = function(Val)
-            if Val == 'SearchBar' then
-                SearchForItem.Object.Visible = true
-                DropdownListForBackpack.Object.Visible = false
-            else
-                SearchForItem.Object.Visible = false
-                DropdownListForBackpack.Object.Visible = true
-            end
-        end,
-        Default = 'Dropdown'
-    })
-
-
+    
     local function UpdateBackpackPlayerList(newList)
         DropdownListForBackpack.UpdateList(newList)
     end
-
-    UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
-
+    
     lplr:WaitForChild('Backpack', 60).ChildAdded:Connect(function(child)
         if not RemoveToolFromInventorySettings.BackPack[child.Name] then
             RemoveToolFromInventorySettings.BackPack[child.Name] = child
@@ -1947,16 +1916,21 @@ elseif game.PlaceId == 4620170611 then
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         end
     end)
-
+    
     lplr:WaitForChild('Backpack', 60).ChildRemoved:Connect(function(child)
-        -- see if the item is still in the players inventory
-        if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) or lplr.Character:FindFirstChild(child.Name) then
-            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
-        else
-            table.remove(RemoveToolFromInventorySettings.BackpackForList, child.Name)
-            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
+        if not (lplr:FindFirstChild('Backpack', 60):FindFirstChild(child.Name) or lplr.Character:FindFirstChild(child.Name)) then
+            for i, itemName in ipairs(RemoveToolFromInventorySettings.BackpackForList) do
+                if itemName == child.Name then
+                    table.remove(RemoveToolFromInventorySettings.BackpackForList, i)
+                    UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
+                    break
+                end
+            end
         end
     end)
+    
+
+    ----
 
 
 
@@ -2210,7 +2184,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
 
 if a then
     a()
