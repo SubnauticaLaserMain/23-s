@@ -2028,8 +2028,7 @@ elseif game.PlaceId == 4620170611 then
         if nearestBadGuy and nearestDistance <= maxRange then
             local args = {
                 [1] = nearestBadGuy.Parent,
-                [2] = Others['Damage'],
-                [3] = 1
+                [2] = Others['Damage']
             }
             HitBadguyEvent:FireServer(table.unpack(args))
 
@@ -2105,7 +2104,7 @@ elseif game.PlaceId == 4620170611 then
                                     track:Play()
                                 end
                             end
-                        end    
+                        end
                     end
 
                     --[[ If KillAura is disabled, exit the loop ]]
@@ -2132,7 +2131,7 @@ elseif game.PlaceId == 4620170611 then
         end,
         HoverText = 'How many miliseconds it takes before another hit.',
         Default = 3,
-        Double = 1 
+        Double = 1
     })
 
 
