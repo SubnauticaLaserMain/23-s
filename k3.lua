@@ -1644,6 +1644,7 @@ elseif game.PlaceId == 4620170611 then
         ['Car Key'] = 'CarKey',
         ['Louie'] = 'Louie',
         ['Teddy Bear'] = 'TeddyBloxpin',
+        ['Plank'] = 'Plank'
     }
 
 
@@ -1723,6 +1724,7 @@ elseif game.PlaceId == 4620170611 then
             'Car Key',
             'Louie',
             'Teddy Bear',
+            'Plank'
         },
         HoverText = 'Select the tool you want to be given.',
         Function = function(Val)
@@ -2026,6 +2028,7 @@ elseif game.PlaceId == 4620170611 then
         local nearestBadGuy, nearestDistance = findNearestEntity(playerPosition, badGuyEntities)
 
         if nearestBadGuy and nearestDistance <= maxRange then
+            print('new target for kill aura is: ' .. tostring(nearestBadGuy.Parent:GetFullName()))
             local args = {
                 [1] = nearestBadGuy.Parent,
                 [2] = Others['Damage']
@@ -2116,7 +2119,8 @@ elseif game.PlaceId == 4620170611 then
                     task.wait(KillAuraSettings['WaitTime'])
                 end
             end
-        end
+        end,
+        Default = false
     })
 
 
@@ -2214,6 +2218,8 @@ elseif game.PlaceId == 4620170611 then
                     GiveFoodRemote():FireServer(table.unpack({
                         [1] = 'Key'
                     }))
+
+                    task.wait(0.15)
 
                     local newKey = GetBackpackItemIfAsync('Key')
 
