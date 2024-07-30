@@ -21,7 +21,7 @@ end
 
 local function SendNotitfication(title, text, delay)
     local suc, res = pcall(function()
-        local frame = GuiLibrary.CreateNotification(title, text, delay)
+        local frame = GuiLibrary.CreateNotification(title, text, (delay or 10))
 
         return frame
     end)
@@ -32,7 +32,7 @@ end
 
 local function SendWarningNotification(title, text, delay)
     local suc, res = pcall(function()
-        local frame = GuiLibrary.CreateNotification(title, text, delay, 'assets/WarningNotification.png')
+        local frame = GuiLibrary.CreateNotification(title, text, (delay or 10), 'assets/WarningNotification.png')
         
         frame.Frame.Frame.ImageColor3 = Color3.fromRGB(236, 129, 44)
 
@@ -1852,94 +1852,63 @@ elseif game.PlaceId == 4620170611 then
 
 
 
-
-    local RemoveToolFromInventorySettings = {[1] = '', BackPack = {}, BackpackForList = {}}
-
-
+    ---- 
+    local RemoveToolFromInventorySettings = {
+        [1] = '', 
+        BackPack = {}, 
+        BackpackForList = {}
+    }
+    
     RemoveToolFromInventory = Utility.CreateOptionsButton({
         Name = 'RemoveFromBackpack',
         Function = function(Callback)
             if Callback then
-                if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
-                    RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]]:Destroy()
-                    RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
-
-                    if RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] then
-                        RemoveToolFromInventorySettings['BackPack'][RemoveToolFromInventorySettings[1]] = nil
+                local itemName = RemoveToolFromInventorySettings[1]
+                local item = RemoveToolFromInventorySettings['BackPack'][itemName]
+                
+                if item then
+                    item:Destroy()
+                    RemoveToolFromInventorySettings['BackPack'][itemName] = nil
+                    RemoveToolFromInventorySettings.BackpackForList = {}  -- Clear the list
+                    for itemName, item in pairs(RemoveToolFromInventorySettings['BackPack']) do
+                        table.insert(RemoveToolFromInventorySettings.BackpackForList, itemName)
                     end
                 end
-
+    
                 RemoveToolFromInventory['ToggleButton'](false)
             end
         end,
-        HoverText = '[WARNING]: THIS MODULE IS WONDER DEV, SO, BUGS ARE EXSPECTED.'
+        HoverText = '[WARNING]: THIS MODULE IS WONDER DEV, SO, BUGS ARE EXPECTED.'
     })
-
-
-    for a, b in lplr:WaitForChild('Backpack', 60):GetChildren() do
-        RemoveToolFromInventorySettings.BackPack[b.Name] = b
-        table.insert(RemoveToolFromInventorySettings.BackpackForList, b.Name)
+    
+    local function UpdateBackpackList()
+        RemoveToolFromInventorySettings.BackpackForList = {}
+        for itemName, _ in pairs(RemoveToolFromInventorySettings.BackPack) do
+            table.insert(RemoveToolFromInventorySettings.BackpackForList, itemName)
+        end
     end
+    
+    UpdateBackpackList()
 
-    print(RemoveToolFromInventory)
-
+    for _, item in ipairs(lplr:WaitForChild('Backpack', 60):GetChildren()) do
+        RemoveToolFromInventorySettings.BackPack[item.Name] = item
+        table.insert(RemoveToolFromInventorySettings.BackpackForList, item.Name)
+    end
+    
     local DropdownListForBackpack = RemoveToolFromInventory.CreateDropdown({
         Name = 'Backpack',
         List = RemoveToolFromInventorySettings.BackpackForList,
-        Default = (function()
-            for a, b in lplr:WaitForChild('Backpack', 60):GetChildren() do
-                if a and b then
-                    if a == 1 then
-                        return b.Name
-                    end
-                end
-            end
-        end)(),
+        Default = RemoveToolFromInventorySettings.BackpackForList[1],  -- Set a default value here
         HoverText = 'Select the item you want to remove from your inventory',
         Function = function(Val)
             RemoveToolFromInventorySettings[1] = Val
         end
     })
-
-
-
-    local SearchForItem = RemoveToolFromInventory.CreateTextBox({
-        TempText = 'Type the name of the Item you want to remove.',
-        Name = 'Search',
-        FocusLost = function(Val)
-            RemoveToolFromInventorySettings[1] = Val
-        end
-    })
-
-
-    SearchForItem.Object.Visible = false
-
-
-    RemoveToolFromInventory.CreateDropdown({
-        Name = 'Method',
-        List = {
-            'Dropdown',
-            'SearchBar'
-        },
-        Function = function(Val)
-            if Val == 'SearchBar' then
-                SearchForItem.Object.Visible = true
-                DropdownListForBackpack.Object.Visible = false
-            else
-                SearchForItem.Object.Visible = false
-                DropdownListForBackpack.Object.Visible = true
-            end
-        end,
-        Default = 'Dropdown'
-    })
-
-
+    
     local function UpdateBackpackPlayerList(newList)
         DropdownListForBackpack.UpdateList(newList)
     end
-
-    UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
-
+    
     lplr:WaitForChild('Backpack', 60).ChildAdded:Connect(function(child)
         if not RemoveToolFromInventorySettings.BackPack[child.Name] then
             RemoveToolFromInventorySettings.BackPack[child.Name] = child
@@ -1947,16 +1916,21 @@ elseif game.PlaceId == 4620170611 then
             UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
         end
     end)
-
+    
     lplr:WaitForChild('Backpack', 60).ChildRemoved:Connect(function(child)
-        -- see if the item is still in the players inventory
-        if lplr:WaitForChild('Backpack', 60):FindFirstChild(child.Name) or lplr.Character:FindFirstChild(child.Name) then
-            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
-        else
-            table.remove(RemoveToolFromInventorySettings.BackpackForList, child.Name)
-            UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
+        if not (lplr:FindFirstChild('Backpack', 60):FindFirstChild(child.Name) or lplr.Character:FindFirstChild(child.Name)) then
+            for i, itemName in ipairs(RemoveToolFromInventorySettings.BackpackForList) do
+                if itemName == child.Name then
+                    table.remove(RemoveToolFromInventorySettings.BackpackForList, i)
+                    UpdateBackpackPlayerList(RemoveToolFromInventorySettings.BackpackForList)
+                    break
+                end
+            end
         end
     end)
+    
+
+    ----
 
 
 
@@ -1970,7 +1944,7 @@ elseif game.PlaceId == 4620170611 then
                 local U = M:WaitForChild('TextLabel', 60)
 
                 if U then
-                    SendNotitfication('Safe Code', "The code is '" .. tostring(U.Text) .. "'.")
+                    SendNotitfication('Safe Code', "The code is '" .. tostring(U.Text) .. "'.", 6)
                 end
             end
         end
@@ -2012,11 +1986,7 @@ elseif game.PlaceId == 4620170611 then
         local playerPosition = HRP.Position
 
         local badGuysFolder = getBadGuysFolder()
-        local badGuysFrontFolder = getBadGuysFolderFrontDoor()
-        local badGuysBossFolder = getBadGuysFolderBoss()
         local badGuyModels = badGuysFolder:GetChildren()
-        local badGuyFrontModels = badGuysFrontFolder:GetChildren()
-        local badGuyBossModels = badGuysBossFolder:GetChildren()
 
         local badGuyEntities = {}
         for _, badGuy in ipairs(badGuyModels) do
@@ -2058,22 +2028,21 @@ elseif game.PlaceId == 4620170611 then
         if nearestBadGuy and nearestDistance <= maxRange then
             local args = {
                 [1] = nearestBadGuy.Parent,
-                [2] = Others['Damage'],
-                [3] = 1
+                [2] = Others['Damage']
             }
             HitBadguyEvent:FireServer(table.unpack(args))
 
-            if (badGuy and badGuy.Parent) then
-                local Hum = badGuy.Parent:FindFirstChild('Humanoid')
+            if (nearestBadGuy and nearestBadGuy.Parent) then
+                local Hum = nearestBadGuy.Parent:FindFirstChild('Humanoid')
 
                 if Hum then
                     if Hum.Health == 5 then
                         local args = {
-                            [1] = badGuy.Parent,
+                            [1] = nearestBadGuy.Parent,
                             [2] = 996
                         }
                         
-                        HitBadguyEvent:FireServer(unpack(args))
+                        HitBadguyEvent:FireServer(table.unpack(args))
                     end
                 end
             end
@@ -2117,9 +2086,9 @@ elseif game.PlaceId == 4620170611 then
                         local Weapon = FetchPlayerCharacter():FindFirstChildOfClass('Tool')
                         if Weapon then
                             local oldWeapon = Weapon
-                            Weapon = Weapon:FindFirstChild('Level41') 
-                                or Weapon:FindFirstChild('Level42') 
-                                or Weapon:FindFirstChild('Level51') 
+                            Weapon = Weapon:FindFirstChild('Level41')
+                                or Weapon:FindFirstChild('Level42')
+                                or Weapon:FindFirstChild('Level51')
                                 or Weapon:FindFirstChild('Level52')
 
                             if Weapon then
@@ -2135,7 +2104,7 @@ elseif game.PlaceId == 4620170611 then
                                     track:Play()
                                 end
                             end
-                        end    
+                        end
                     end
 
                     --[[ If KillAura is disabled, exit the loop ]]
@@ -2162,7 +2131,7 @@ elseif game.PlaceId == 4620170611 then
         end,
         HoverText = 'How many miliseconds it takes before another hit.',
         Default = 3,
-        Double = 1 
+        Double = 1
     })
 
 
@@ -2208,13 +2177,169 @@ elseif game.PlaceId == 4620170611 then
             KillAuraSettings['Multi-Aura'] = val
         end
     })
+
+
+
+    local function GetBackpackItemIfAsync(ItemName)
+        local Backpack = lplr:WaitForChild('Backpack', 60)
+
+        if Backpack then
+            local IsItem = Backpack:FindFirstChild(ItemName)
+
+            if IsItem then
+                return IsItem
+            else
+                IsItem = FetchPlayerCharacter():FindFirstChild(ItemName)
+
+                if IsItem then
+                    return IsItem
+                end
+            end
+        end
+    end
+
+
+    UnlockBasementDoor = Blatant.CreateOptionsButton({
+        Name = 'UnlockBasementDoor',
+        Function = function(Callback)
+            if Callback then
+                local Key = GetBackpackItemIfAsync('Key')
+
+                if Key then
+                    FetchHumanoid():EquipTool(Key)
+                    task.wait(0.35)
+                    game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
+                else
+                    GiveFoodRemote():FireServer(table.unpack({
+                        [1] = 'Key'
+                    }))
+
+                    local newKey = GetBackpackItemIfAsync('Key')
+
+                    if newKey then
+                        game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
+                    end
+                end
+
+                SendNotitfication('UnlockBasementDoor', 'Successfully unlocked basement door.', 5)
+                UnlockBasementDoor['ToggleButton'](false)
+            end
+        end
+    })
+
+
+
+
+    AutoDoSafeCode = Blatant.CreateOptionsButton({
+        Name = 'OpenSafe',
+        Function = function(Callback)
+            if Callback then
+                local a, b = pcall(function()
+                    local function GetCode()
+                        local CodeNote = Workspace:WaitForChild('CodeNote', 60)
+                
+                        if CodeNote then
+                            local M = CodeNote:WaitForChild('SurfaceGui', 60)
+                
+                            if M then
+                                local U = M:WaitForChild('TextLabel', 60)
+                
+                                if U then
+                                    return U.Text
+                                end
+                            end
+                        end
+                    end
+
+                    local args = {
+                        [1] = tostring(GetCode())
+                    }
+                    
+                    game:GetService("ReplicatedStorage").RemoteEvents.Safe:FireServer(table.unpack(args))
+                    
+                    SendNotitfication('OpenSafe', 'Successfully opened safe')
+                    AutoDoSafeCode['ToggleButton'](false)
+                end)
+
+                if not a then
+                    SendWarningNotification('OpenSafe ERROR', 'Please report this error: ' .. tostring(b), 10)
+                end
+            end
+        end
+    })
+
+
+
+    local LadderEventO = {
+        [1] = 1
+    } 
+
+    DoLadderEvent = Blatant.CreateOptionsButton({
+        Name = 'LadderEvent',
+        Function = function(Callback)
+            if Callback then
+                local args = {
+                    [1] = LadderEventO[1]
+                }
+
+                ReplicatedStorage:WaitForChild('RemoteEvents'):WaitForChild('Ladder'):FireServer(table.unpack(args))
+
+
+                DoLadderEvent['ToggleButton'](false)
+            end
+        end
+    })
+
+
+    DoLadderEvent.CreateDropdown({
+        Name = 'Options',
+        List = {
+            'Equip',
+            'UnEquip'
+        },
+        HoverText = 'Set what action the button will do.',
+        Function = function(Val)
+            if Val == 'Equip' then
+                LadderEventO[1] = 1
+            elseif Val == 'UnEquip' then
+                LadderEventO[1] = 2
+            end
+        end
+    })
+
+
+
+    AtticGetItem = Utility.CreateOptionsButton({
+        Name = 'GetAtticItem',
+        Function = function(Callback)
+            if Callback then
+                local a, b = pcall(function()
+                    local args = {
+                        [1] = 1
+                    }
+
+                    ReplicatedStorage:WaitForChild('RemoteEvents'):WaitForChild('BloxyPack'):FireServer(table.unpack(args))
+
+                    SendNotitfication('GetAtticItem', 'Successfully Grabbed item', 10)
+                    AtticGetItem['ToggleButton'](false)
+                end)
+
+                if not a then
+                    SendWarningNotification('GetAtticItem', 'Please report this error: ' .. tostring(b), 10)
+                end
+
+                AtticGetItem['ToggleButton'](false)
+            end
+        end,
+        HoverText = "When pressed, will automaticly get the attic item, item can be a 'BloxyCola Pack' or a 'Pan'."
+    })
 end
 
 shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/owp.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
 
 if a then
     a()
