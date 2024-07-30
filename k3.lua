@@ -2226,6 +2226,47 @@ elseif game.PlaceId == 4620170611 then
             end
         end
     })
+
+
+
+
+    AutoDoSafeCode = Blatant.CreateOptionsButton({
+        Name = 'OpenSafe',
+        Function = function(Callback)
+            if Callback then
+                local a, b = pcall(function()
+                    local function GetCode()
+                        local CodeNote = Workspace:WaitForChild('CodeNote', 60)
+                
+                        if CodeNote then
+                            local M = CodeNote:WaitForChild('SurfaceGui', 60)
+                
+                            if M then
+                                local U = M:WaitForChild('TextLabel', 60)
+                
+                                if U then
+                                    return U.Text
+                                end
+                            end
+                        end
+                    end
+
+                    local args = {
+                        [1] = tostring(GetCode())
+                    }
+                    
+                    game:GetService("ReplicatedStorage").RemoteEvents.Safe:FireServer(table.unpack(args))
+                    
+                    SendNotitfication('OpenSafe', 'Successfully opened safe')
+                    AutoDoSafeCode['ToggleButton'](false)
+                end)
+
+                if not a then
+                    SendWarningNotification('OpenSafe ERROR', 'Please report this error: ' .. tostring(b))
+                end
+            end
+        end
+    })
 end
 
 shared.VapeManualLoad = true
