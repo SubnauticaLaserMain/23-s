@@ -2204,10 +2204,11 @@ elseif game.PlaceId == 4620170611 then
         Function = function(Callback)
             if Callback then
                 local Key = GetBackpackItemIfAsync('Key')
+                local Hum = FetchHumanoid()
 
                 if Key then
                     FetchHumanoid():EquipTool(Key)
-                    task.wait(0.35)
+                    task.wait(0.15)
                     game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
                 else
                     GiveFoodRemote():FireServer(table.unpack({
@@ -2217,6 +2218,8 @@ elseif game.PlaceId == 4620170611 then
                     local newKey = GetBackpackItemIfAsync('Key')
 
                     if newKey then
+                        Hum:EquipTool(newKey)
+                        task.wait(0.15)
                         game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
                     end
                 end
@@ -2391,7 +2394,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
 
 if a then
     a()
