@@ -1233,7 +1233,9 @@ if game.PlaceId == 13864667823 then
             end
 
             while (HealAllLoop == true) do
-                HealAllPlayers()
+                if not (lplr:WaitForChild('Backpack'):FindFirstChild('GoldenApple') or lplr.Character:FindFirstChild('GoldenApple')) then
+                    HealAllPlayers()
+                end
                 task.wait(3)
             end
 
@@ -1489,7 +1491,23 @@ elseif game.PlaceId == 4620170611 then
 
 
 
-    local A = {[1] = 1, [2] = 'Front'}
+    local A = {[1] = 1, [2] = 'Front', [3] = 'Opened'}
+
+
+    local function GetDoorOpened(DoorModel)
+        if DoorModel then
+            local Opened = DoorModel:FindFirstChild('Open')
+            local Close = DoorModel:FindFirstChild('Close')
+
+            if Opened and Opened.Transparency == 0 then
+                return 'Opened'
+            elseif Close and Close.Transparency == 0 then
+                return 'Closed'
+            end
+        end
+    end
+
+
 
     local AutoDoor = Utility.CreateOptionsButton({
         Name = 'AutoDoor',
@@ -1497,12 +1515,19 @@ elseif game.PlaceId == 4620170611 then
             getgenv().GetAutoDoorAllowed = Callback
             if Callback then
                 repeat
-                    DoDoorRemote(A[2])
+                    if GetDoorOpened(Workspace:FindFirstChild(A[2])) == A[3] then
+                        DoDoorRemote(A[2])
+                    end
+                    if type(A[1]) ~= 'number' then
+                        A[1] = 1
+                    end
+                    
                     task.wait(A[1])
                 until (not GetAutoDoorAllowed)
             end
         end
     })
+
 
 
     AutoDoor.CreateSlider({
@@ -1526,6 +1551,19 @@ elseif game.PlaceId == 4620170611 then
             A[2] = Val:gsub(' Door', '')
         end,
         HoverText = 'Wish door will be affected.'
+    })
+
+
+    AutoDoor.CreateDropdown({
+        Name = 'Door State',
+        List = {
+            'Opened',
+            'Closed'
+        },
+        Function = function(val)
+            A[3] = val
+        end,
+        Default = 'Opened'
     })
 
 
@@ -1577,7 +1615,7 @@ elseif game.PlaceId == 4620170611 then
         Name = 'DoLights',
         Default = false,
         Function = function(Val)
-            A[1] = Val
+            B[1] = Val
         end
     })
 
@@ -1585,7 +1623,7 @@ elseif game.PlaceId == 4620170611 then
         Name = 'TurnOnPC',
         Default = true,
         Function = function(Val)
-            A[2] = Val
+            B[2] = Val
         end
     })
 
@@ -1644,6 +1682,7 @@ elseif game.PlaceId == 4620170611 then
         ['Car Key'] = 'CarKey',
         ['Louie'] = 'Louie',
         ['Teddy Bear'] = 'TeddyBloxpin',
+        ['Plank'] = 'Plank'
     }
 
 
@@ -1723,6 +1762,7 @@ elseif game.PlaceId == 4620170611 then
             'Car Key',
             'Louie',
             'Teddy Bear',
+            'Plank'
         },
         HoverText = 'Select the tool you want to be given.',
         Function = function(Val)
@@ -2026,6 +2066,7 @@ elseif game.PlaceId == 4620170611 then
         local nearestBadGuy, nearestDistance = findNearestEntity(playerPosition, badGuyEntities)
 
         if nearestBadGuy and nearestDistance <= maxRange then
+            print('new target for kill aura is: ' .. tostring(nearestBadGuy.Parent:GetFullName()))
             local args = {
                 [1] = nearestBadGuy.Parent,
                 [2] = Others['Damage']
@@ -2116,7 +2157,8 @@ elseif game.PlaceId == 4620170611 then
                     task.wait(KillAuraSettings['WaitTime'])
                 end
             end
-        end
+        end,
+        Default = false
     })
 
 
@@ -2204,19 +2246,24 @@ elseif game.PlaceId == 4620170611 then
         Function = function(Callback)
             if Callback then
                 local Key = GetBackpackItemIfAsync('Key')
+                local Hum = FetchHumanoid()
 
                 if Key then
                     FetchHumanoid():EquipTool(Key)
-                    task.wait(0.35)
+                    task.wait(0.15)
                     game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
                 else
                     GiveFoodRemote():FireServer(table.unpack({
                         [1] = 'Key'
                     }))
 
+                    task.wait(0.15)
+
                     local newKey = GetBackpackItemIfAsync('Key')
 
                     if newKey then
+                        Hum:EquipTool(newKey)
+                        task.wait(0.15)
                         game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
                     end
                 end
@@ -2366,6 +2413,9 @@ elseif game.PlaceId == 4620170611 then
 
                         if Items and Items[1] then
                             for i, v in pairs(Items) do
+                                if (v and v.Parent == Work) then
+                                    Items[i].Parent = Backpack
+                                end
                                 Items[i]:Destroy()
                                 Items[i] = nil
                             end
@@ -2388,7 +2438,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
 
 if a then
     a()
