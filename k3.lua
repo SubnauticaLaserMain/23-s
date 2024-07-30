@@ -2267,6 +2267,72 @@ elseif game.PlaceId == 4620170611 then
             end
         end
     })
+
+
+
+    local LadderEventO = {
+        [1] = 1
+    } 
+
+    DoLadderEvent = Blatant.CreateOptionsButton({
+        Name = 'LadderEvent',
+        Function = function(Callback)
+            if Callback then
+                local args = {
+                    [1] = LadderEventO[1]
+                }
+
+                ReplicatedStorage:WaitForChild('RemoteEvents'):WaitForChild('Ladder'):FireServer(table.unpack(args))
+
+
+                DoLadderEvent['ToggleButton'](false)
+            end
+        end
+    })
+
+
+    DoLadderEvent.CreateDropdown({
+        Name = 'Options',
+        List = {
+            'Equip',
+            'UnEquip'
+        },
+        HoverText = 'Set what action the button will do.',
+        Function = function(Val)
+            if Val == 'Equip' then
+                LadderEventO[1] = 1
+            elseif Val == 'UnEquip' then
+                LadderEventO[1] = 2
+            end
+        end
+    })
+
+
+
+    AtticGetItem = Utility.CreateOptionsButton({
+        Name = 'GetAtticItem',
+        Function = function(Callback)
+            if Callback then
+                local a, b = pcall(function()
+                    local args = {
+                        [1] = 1
+                    }
+
+                    ReplicatedStorage:WaitForChild('RemoteEvents'):WaitForChild('BloxyPack'):FireServer(table.unpack(args))
+
+                    SendNotitfication('GetAtticItem', 'Successfully Grabbed item')
+                    AtticGetItem['ToggleButton'](false)
+                end)
+
+                if not a then
+                    SendWarningNotification('GetAtticItem', 'Please report this error: ' .. tostring(b))
+                end
+
+                AtticGetItem['ToggleButton'](false)
+            end
+        end,
+        HoverText = "When pressed, will automaticly get the attic item, item can be a 'BloxyCola Pack' or a 'Pan'."
+    })
 end
 
 shared.VapeManualLoad = true
