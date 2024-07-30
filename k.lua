@@ -2327,11 +2327,60 @@ elseif game.PlaceId == 4620170611 then
                 if not a then
                     SendWarningNotification('GetAtticItem', 'Please report this error: ' .. tostring(b), 10)
                 end
-
-                AtticGetItem['ToggleButton'](false)
             end
         end,
         HoverText = "When pressed, will automaticly get the attic item, item can be a 'BloxyCola Pack' or a 'Pan'."
+    })
+
+
+    RemoveItem = Utility.CreateOptionsButton({
+        Name = 'RemoveItem',
+        Function = function(Callback)
+            getgenv().CallP = Callback
+            if Callback then
+                while CallP do
+                    local items = {
+                        'MedKit',
+                        'Cure'
+                    }
+                    local Backpack = lplr:WaitForChild('Backpack', 60)
+                    local Work = FetchPlayerCharacter()
+
+                    if Backpack then
+                        local Items = {}
+                        local Count = 1
+
+                        for i, v in pairs(Backpack:GetChildren()) do
+                            if table.find(items, v.Name) and (v:FindFirstChild('Charges') and v:FindFirstChild('Charges'):IsA('IntValue') and v:FindFirstChild('Charges').Value <= 0) then
+                                Items[Count] = v
+                                Count = Count + 1
+                            end
+                        end
+
+                        for i, v in pairs(Work:GetChildren()) do
+                            if (table.find(items, v.Name)) and (v:FindFirstChild('Charges') and v:FindFirstChild('Charges'):IsA('IntValue') and v:FindFirstChild('Charges').Value <= 0) then
+                                Items[Count] = v
+                                Count = Count + 1
+                            end
+                        end
+
+                        if Items and Items[1] then
+                            for i, v in pairs(Items) do
+                                Items[i]:Destroy()
+                                Items[i] = nil
+                            end
+                        end
+                    end
+
+                    if not CallP then
+                        break
+                    end
+                    
+                    task.wait(0.34)
+                end
+            end
+        end,
+        HoverText = "Will automaticly remove 'Cures' and 'MedKits' if has 0 charges left."
     })
 end
 
@@ -2339,7 +2388,7 @@ shared.VapeManualLoad = true
 
 
 --[[
-local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k3.lua', true))()
+local a,b = loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/23-s/main/k.lua', true))()
 
 if a then
     a()
